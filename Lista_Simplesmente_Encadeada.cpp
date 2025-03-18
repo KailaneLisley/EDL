@@ -53,13 +53,21 @@ int main (){
                 break;
             case 6:
                 int contador = contarElementos(lista);
-                printf("Total de elementos na lista e igual a %d\n\n", contador);
+                if(contador == 0){
+                        printf("Não ha nada na lista");
+                } else {
+                    printf("Total de elementos na lista e igual a %d\n\n", contador);
+                }
                 break;
             case 7:
                 printf("Qual valor deseja procurar? ");
                 scanf("%d", &n_);
                 int encontrou = procurarValor(lista, n_);
-                printf("O valor %d foi encontrado %d vezes\n\n", n_, encontrou);
+                if(encontrou == 0){
+                    printf("Nada foi encontrado");
+                } else {
+                    printf("O valor %d foi encontrado %d vezes\n\n", n_, encontrou);
+                }
                 break;
             case 0:
                 liberarLista(&lista);
@@ -88,6 +96,10 @@ void exibirOpcoes(){
 void inserirValorInicio(LSE** ptr, int valor){
     LSE* novo; 
     novo = (LSE*) malloc(sizeof(LSE));
+    if(novo==NULL){
+        printf("ERRO!");
+        return;
+    }
     novo->info = valor;
     novo->prox = NULL;
     if(*ptr==NULL){
@@ -102,10 +114,15 @@ void inserirValorUltimo(LSE** ptr, int valor){
     LSE* novo;
     LSE* aux; 
     novo = (LSE*) malloc(sizeof(LSE));
+    if(novo==NULL){
+        printf("ERRO!");
+        return;
+    }
     novo->info = valor;
     novo->prox = NULL;
     if(*ptr==NULL){
         *ptr=novo;
+        return;
     } else {
         aux = *ptr;
         while(aux->prox!=NULL){
