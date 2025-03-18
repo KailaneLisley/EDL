@@ -63,11 +63,7 @@ int main (){
                 printf("Qual valor deseja procurar? ");
                 scanf("%d", &n_);
                 int encontrou = procurarValor(lista, n_);
-                if(encontrou == 0){
-                    printf("Nada foi encontrado");
-                } else {
-                    printf("O valor %d foi encontrado %d vezes\n\n", n_, encontrou);
-                }
+                printf("O valor %d foi encontrado %d vezes\n\n", n_, encontrou);
                 break;
             case 0:
                 liberarLista(&lista);
