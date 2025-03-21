@@ -1,6 +1,6 @@
 /*
 Lista Simplesmente Encadeada | Atividade de EDL
-(Lista de inteiros e com repetição)
+(Lista de inteiros, desordenada e com repetição)
 Aluna: Kailane Lisley d Araujo Silva | RA: 851345
 */
 #include <stdio.h>
