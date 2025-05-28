@@ -5,10 +5,8 @@
 #define S_ATIVO 1 	  //Status Ativo
 #define S_REMOVIDO 0  //Status removido
 #define N 37
-/* Foi decidido que o tamanho da tabela de Hashing será 37, 
-pois esse foi o menor número possível encontrado que,
-além de atender todos os crtérios de escolha do tamanho da tabela,
-reduz colisões e garante uma boa distribuição dos dados */
+/* Foi decidido que o tamanho da tabela de Hashing será 37, pois esse foi o menor número possível encontrado que,
+além de atender todos os crtérios de escolha do tamanho da tabela, reduz colisões e garante uma boa distribuição dos dados */
 
 typedef struct produto {  	// Estrutura de um produto
 	char chave[12];
@@ -123,7 +121,7 @@ void liberarArquivo(FILE* arq) {
     }
     rewind(arq);  											// Volta para o início do arquivo original
 	Produto produto;										// Cria uma estrutura para um produto
-    while (fread(&produto, sizeof(Produto), 1, arq) == 1) {	// Enquanto a função conseguir ler apenas 1 produto por vez:
+    while (fread(&produto, sizeof(Produto), 1, arq) == 1) {	// Enquanto a função conseguir ler apenas 1 produto por vez...
         if (produto.status == S_ATIVO) {						// Verifica se o produto está ativo (Status == 1)
             fwrite(&produto, sizeof(Produto), 1, arq_aux);		// Lê o registro e armazena as informações em 'produto'
         }
@@ -204,29 +202,22 @@ void inserirTabelaHash(NoLDE* tabelaHashing[], char chave[], int pos) {
 	}
 }
 
-void criarIndice(FILE* arq, NoLDE* tabelaHashing[]) {
-    for (int i = 0; i < N; i++) {
-        tabelaHashing[i] = NULL;
+// PROCEDIMENTO PARA CRIAR UM ÍNDICE PARA CADA ITEM ATIVO DO ARQUIVO
+void criarIndice(FILE* arq, NoLDE* tabelaHashing[]) {                  
+    for (int i = 0; i < N; i++) {                                     
+        tabelaHashing[i] = NULL;                                    // Inicializa toda a Tabela de Hash com NULL
     }
+    Produto produto;                                                // Variável para armazenar temporariamente os dados de um produto lido do arquivo 
+    int pos = 0;                                                    // Variável para armazenar a posição do produto no arquivo
+    rewind(arq);                                                    // Posiciona o cursor no início do arquivo
 
-    Produto produto;
-    int pos = 0;
-    rewind(arq);
-
-    while (fread(&produto, sizeof(Produto), 1, arq) == 1) {
-        if (produto.status == S_ATIVO) {
-            inserirTabelaHash(tabelaHashing, produto.chave, pos);
+    while (fread(&produto, sizeof(Produto), 1, arq) == 1) {         // Enquanto a função conseguir ler apenas 1 produto por vez... 
+        if (produto.status == S_ATIVO) {                                // Verifica se o produto lido está com o status ativo
+            inserirTabelaHash(tabelaHashing, produto.chave, pos);       // Se o produto está ativo, insere o produto na tabela de hashing
         }
-        pos++;
+        pos++;                                                          // Incrementa a posição do produto no arquivo
     }
 }
-/* Preencher a tabela de hashing com as chaves dos registros que estao armazenados no arquivo
-	*      1.1 - Ler o arquivo registro a registro ate o final.
-	*      1.2 - Para cada registro lido, aplicar a funcao de hashing a chave (ou seja, ao codigo do produto).
-	*      1.3 - O resultado da funcaoo indica a posicao na tabela onde a chave sera inserida.
-	*      1.4 - Criar o no, preencher com a chave e a posicao dela no arquivo e inserir na tabela, 
-	*            na lista encadeada correspondente, de forma que a lista permaneca ordenada 
-    *            por ordem crescente de codigo do produto. */
 
 // PROCEDIMENTO PARA DESLOCAR OS QUE COMPOEM AS LISTAS DA TABELA DE HASHING, DEIXANDO TODAS AS LISTAS VAZIAS
 void desalocarIndice(NoLDE* tabelaHashing[]) {
@@ -243,82 +234,75 @@ void desalocarIndice(NoLDE* tabelaHashing[]) {
 
 // PROCEDIMENTO PARA REMOVER UM PRODUTO DA TABELA DE HASHING
 void removerTabelaHash(NoLDE* tabelaHashing[], char chave[], int posTabela) {
-    int indice = funcaoHashing(chave);
-    NoLDE* anterior = NULL;
-    NoLDE* atual = localizarNo(tabelaHashing[indice], chave, &anterior);
+    int indice = funcaoHashing(chave);                                      // Aplicar a funcao de hashing na chave 
+    NoLDE* anterior = NULL;                                                 // Nó 'anterior inicializa com NULL'
+    NoLDE* atual = localizarNo(tabelaHashing[indice], chave, &anterior);    // Nó 'atual' recebe: NULL se não encontrar a chave ou a possição da chave existente 
 
-    if (atual != NULL && strcmp(chave, atual->chave) == 0) {
-        if (anterior != NULL) {
-            anterior->prox = atual->prox;
-        } else {
-            tabelaHashing[indice] = atual->prox;
+    if (atual != NULL && strcmp(chave, atual->chave) == 0) {                // Verifica se algum nó foi encontrado e se este nó é o que estamos procurando 
+        if (anterior != NULL) {                                                 // Se o nó encontrado não for o primeiro nó...             
+            anterior->prox = atual->prox;                                           // Liga o nó anterior ao próximo nó em relação ao atual        
+        } else {                                                                // Senão (caso seja o primeiro nó...)
+            tabelaHashing[indice] = atual->prox;                                    // A entrada da tabela para o indice específico recebe o próximo nó em relaçao ao nó atual
         }
-        if (atual->prox != NULL) {
-            atual->prox->ant = anterior;
+
+        if (atual->prox != NULL) {                                              // Se o nó atual não for o último...
+            atual->prox->ant = anterior;                                            // Liga o próximo nó ao nó anterior em relação ao atual
         }
-        free(atual);
+        free(atual);                                                            // Remove nó atual
     } else {
         printf("Produto com chave %s não encontrado na tabela.\n", chave);
     }
 }
-/* Remover da tabela de hashing o no que contem o codigo passado como parametro. 
-	* Recebe como parametro tambem a posicao na tabela onde a chave se encontra. */
 
 // PROCEDIMENTO PARA CADASTRAR UM PRODUTO NOVO NO ARQUIVO
 void cadastrar(FILE* arq, NoLDE* tabelaHashing[]) {
-    Produto produto;
-    printf("Informe a chave do produto: ");
+    Produto produto;                                                // Variável para armazenar temporariamente os dados de um produto lido do arquivo 
+    printf("Informe a chave do produto: ");                         // Solicita o codigo do produto a ser cadastrado
     fgets(produto.chave, sizeof(produto.chave), stdin);
     produto.chave[strcspn(produto.chave, "\n")] = '\0';
 
-    if (buscar(tabelaHashing, produto.chave) != -1) {
-        printf("Produto já cadastrado.\n");
+    if (buscar(tabelaHashing, produto.chave) != -1) {               // Verifica se o produto já existe na tabela 
+        printf("Produto já cadastrado.\n");                             // Se existir, não realiza o cadastro
         return;
     }
-
-    printf("Informe a descricao: ");
+    printf("Informe a descricao: ");                                // Solicita descrição do produto
     fgets(produto.descricao, sizeof(produto.descricao), stdin);
     produto.descricao[strcspn(produto.descricao, "\n")] = '\0';
 
-    printf("Informe o preco: ");
+    printf("Informe o preco: ");                                    // Solicitar preço do produto
     scanf("%f", &produto.preco);
-    printf("Informe a quantidade em estoque: ");
+    printf("Informe a quantidade em estoque: ");                    // Solicitar a quantidade em estoque do produto
     scanf("%d", &produto.qtdEstoque);
     getchar(); // consumir o \n
 
-    produto.status = S_ATIVO;
+    produto.status = S_ATIVO;                                       // Define o status do novo produto como ativo
 
-    fseek(arq, 0, SEEK_END);
-    int pos = ftell(arq) / sizeof(Produto);
-    fwrite(&produto, sizeof(Produto), 1, arq);
+    fseek(arq, 0, SEEK_END);                                        // Move o cursos para o final do arquivo
+    fwrite(&produto, sizeof(Produto), 1, arq);                      // Cadastra produto no inal do arquivo
 
-    inserirTabelaHash(tabelaHashing, produto.chave, pos);
+    fseek(arq, 0, SEEK_SET);                                        // Move o cursor para o comeo do arquivo 
+    Produto p;                                                      // Variável para armazenar temporáriamente os dados de um produto lido do arquivo
+    int pos = 0;                                                    // Variável para armazenar a prosição do produto cadastrado no arquivo
+    while (fread(&p, sizeof(Produto), 1, arq) == 1) {               // Percorre todo o arquivo 
+        pos++;                                                      // Icrementa a posição até chegar a última posição do arquivo
+    }
 
+    inserirTabelaHash(tabelaHashing, produto.chave, pos);           // Insere novo produto cadastrado na tabela de hash
     printf("Produto cadastrado com sucesso!\n");
 }
-
-/* Cadastrar o registro do produtp no arquivo e inserir a chave (codigo do produto) na tabela de hashing.
-	* 1 - Solicita o codigo do produto a ser cadastrado.
-	* 2 - Procura pelo codigo na tabela de hashing.
-	* 3 - Caso encontre, informa que o produto ja esta no cadastro.
-	* 4 - Caso nao encontre, solicita os demais dados do produto, o insere no final do arquivo.
-	* 5 - Insere a chave, juntamente com sua posicao no arquivo, na tabela de hashing.
-	*     Utilize para isso o procedimento "inserirTabelaHash". */
 
 // PROCEDIMENTO PARA CONSULTAR UM PRODUTO
 void consultar(FILE* arq, NoLDE* tabelaHashing[]) {
     char chave[12];
-    printf("Informe a chave do produto: ");
+    printf("Informe a chave do produto: ");                             // Solicita o codigo do produto a ser cadastrado
     fgets(chave, sizeof(chave), stdin);
     chave[strcspn(chave, "\n")] = '\0';
 
-    int pos = buscar(tabelaHashing, chave);
-
-    if (pos == -1) {
-        printf("Produto não encontrado.\n");
-        return;
+    int pos = buscar(tabelaHashing, chave);                             // Procura produto na tabela de hash
+    if (pos == -1) {                                                    // Se a buscar retornar -1...
+        printf("Produto não encontrado.\n");                                // O produto não foi encontrado
+        return;                                                             // Sai do procedimento'1
     }
-
     Produto produto;
     fseek(arq, pos * sizeof(Produto), SEEK_SET);
     fread(&produto, sizeof(Produto), 1, arq);
