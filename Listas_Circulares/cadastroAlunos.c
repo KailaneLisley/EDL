@@ -129,8 +129,8 @@ int isEmpty(Descritor* lista) {
 }
 
 NoLDEC* consultar(Descritor* lista, char nome[]) {      // Função para consultar se um aluno já está cadastrado na lista
-    if (isEmpty(lista)){                                    // Se a lista estiver vazia... 
-        return NULL;                                            // Retorna NULL
+    if (isEmpty(lista)){                                    // Verifica se a lista está vazia 
+        return NULL;                                            
     } 
     NoLDEC* aux = lista->inicio;                            // Cria um ponteiro 'aux' para receber o 1º nó da lista
     do {                                                    // Loop para comparar o nome dos alunos cadastrados com o aluno atual
@@ -216,14 +216,14 @@ void alterarMedia(Descritor* lista, char nome[]) {      //Procedimento para alte
     printf("\nInforme a nova média: ");                     // Pede ao usuário para informar a nova média do aluno atual
     scanf("%f", &aluno->info.media);                        // Lê a nova média
     fflush(stdin);                                          // Limpa o buffer de entrada
-    printf("\nMédia alterada com sucesso!\n");              // Retorna mensagem informando que a alteração ocorreu com sucesso
+    printf("\nMédia alterada com sucesso!\n");              
 }
 
-void alterarFaltas(Descritor* lista, char nome[]) {     //Procedimento para alterar a quantidade de faltas de um aluno
-    NoLDEC* aluno = consultar(lista, nome);                 // Cria um ponteiro 'aluno' para receber o nó correspondente ao aluno consultado      
-    if (aluno == NULL) {                                    // Se o aluno não for encontrado...
-        printf("Aluno não encontrado!\n");                      // Retorna mensagem informando ao usuário que o aluno não foi encontrado nos registros 
-        return;                                                 // Sai do procedimento
+void alterarFaltas(Descritor* lista, char nome[]) {     // Procedimento para alterar a quantidade de faltas de um aluno
+    NoLDEC* aluno = consultar(lista, nome);             // Verifica se o aluno está cadastrado   
+    if (aluno == NULL) {                                   
+        printf("Aluno não encontrado!\n");                      
+        return;                                                 
     }
     int mudanca;                                            // Variável para receber a quantidade de faltas a acrescentar ou remover
     printf("Informe a quantidade de faltas a ser acrescida(+) ou retirada(-): ");
@@ -237,10 +237,10 @@ void alterarFaltas(Descritor* lista, char nome[]) {     //Procedimento para alte
 }
 
 void exibirAluno(Descritor* lista, char nome[]) {       // Procedimento para exibir todos os alunos cadastrados
-    NoLDEC* aluno = consultar(lista, nome);                 // Cria um ponteiro 'aluno' para receber o nó correspondente ao aluno consultado
-    if (aluno == NULL) {                                    // Se o aluno não for encontrado...
-        printf("Aluno não encontrado!\n");                      // Retorna mensagem informando ao usuário que o aluno não foi encontrado nos registros 
-        return;                                                 // Sai do procedimento
+    NoLDEC* aluno = consultar(lista, nome);             // Verifica se o aluno está cadastrado    
+    if (aluno == NULL) {                                    
+        printf("Aluno não encontrado!\n");                     
+        return;                                                 
     }                                                       // Imprimir dados do aluno encontrado 
     printf("\n--- DADOS DO ALUNO ---\n");                       
     printf("Nome: %s\n", aluno->info.nome);
@@ -249,40 +249,45 @@ void exibirAluno(Descritor* lista, char nome[]) {       // Procedimento para exi
 }
 
 void remover(Descritor* lista, char nome[]) {           // Procedimento para remover um aluno do cadastro
-    NoLDEC* aluno = consultar(lista, nome);
+    NoLDEC* aluno = consultar(lista, nome);             // Verifica se o aluno está cadastrado
     if (aluno == NULL) {
         printf("Aluno não encontrado!\n");
         return;
     }
 
-    if (aluno == lista->inicio && aluno == lista->fim) { // Único elemento
+    if (aluno == lista->inicio && aluno == lista->fim) { // Se tiver só um nó, remove-o
         lista->inicio = NULL;
         lista->fim = NULL;
-    } else {
+    } else {                                            // Senão faz a ligação entre o anterior e o próximo do nó atual(que será removido)
         aluno->ant->prox = aluno->prox;
         aluno->prox->ant = aluno->ant;
-        if (aluno == lista->inicio) lista->inicio = aluno->prox;
-        if (aluno == lista->fim) lista->fim = aluno->ant;
+        if (aluno == lista->inicio){                    // Se for o primeiro nó, liga o campo 'inicio' da lista ao nó seguinte ao atual
+            lista->inicio = aluno->prox;
+        }
+        if (aluno == lista->fim){                       // Se for o último nó, liga o campo 'fim' da lista ao nó anterior ao atual
+            lista->fim = aluno->ant;
+        }
     }
-    free(aluno);
-    lista->qtd--;
+    free(aluno);                                        // Libera nó atual
+    lista->qtd--;                                       // Decrementa +1 no campo 'qtd' da lista
     printf("Aluno removido com sucesso!\n");
 }
 
-void limpar(Descritor* lista) {
-    if (lista->inicio == NULL) return;
-
-    NoLDEC* aux = lista->inicio;
-    NoLDEC* temp;
-
+void limpar(Descritor* lista) {                         // Procedimento para limpar a lista 
+    if (isEmpty(lista)){                                // Verifica se a lista está vazia 
+        printf("Lista já está vazia!\n");
+        return;
+    }
+    NoLDEC* aux = lista->inicio;                        // Cria um ponteiro para nó auxiliar para percorrer a lista a artir do primeiro nó
+    NoLDEC* temp;                                       // Cria um ponteiro para nó temporário para remover os nós da lista
     do {
-        temp = aux;
-        aux = aux->prox;
-        free(temp);
-    } while (aux != lista->inicio);
+        temp = aux;                                         // O nó temporário recebe o nó atual
+        aux = aux->prox;                                    // O nó atual recebe o próximo nó da lista
+        free(temp);                                         // Libera o nó temporário
+    } while (aux != lista->inicio);                     // Enquanto não voltar ao início, repete
 
-    lista->inicio = NULL;
-    lista->fim = NULL;
+    lista->inicio = NULL;                               
+    lista->fim = NULL;                                   
     lista->qtd = 0;
 
     printf("Cadastro limpo com sucesso!\n");
