@@ -200,7 +200,7 @@ void listar(Descritor* lista) {                         // Procedimento para lis
     NoLDEC* aux = lista->inicio;                            // Cria um ponteiro 'aux' para receber o 1º nó da lista
     do {                                                    // Loop para exibir informações dos alunos
         printf("\n---- ALUNO %d ----\n", contador++);           // Informar qual a posição na lista do aluno está sendo exibido
-        printf("Nome: %s\n", aux->info.nome);                     // Exibir nome do aluno
+        printf("Nome: %s\n", aux->info.nome);                   // Exibir nome do aluno
         printf("Média: %.2f\n", aux->info.media);               // Exibir média do aluno
         printf("Faltas: %d\n\n", aux->info.faltas);             // Exibir quantidade de faltas do aluno
         aux = aux->prox;                                        // O 'aux' passa a apontar par ao próximo aluno da lista
@@ -213,42 +213,42 @@ void alterarMedia(Descritor* lista, char nome[]) {      //Procedimento para alte
         printf("\nAluno não encontrado!\n");                      // Retorna mensagem informando ao usuário que o aluno não foi encontrado nos registros 
         return;                                                   // Sai do procedimento 
     }
-    printf("\nInforme a nova média: ");                       // Pede ao usuário 
-    scanf("%f", &aluno->info.media);
-    fflush(stdin);
-    printf("\nMédia alterada com sucesso!\n");
+    printf("\nInforme a nova média: ");                     // Pede ao usuário para informar a nova média do aluno atual
+    scanf("%f", &aluno->info.media);                        // Lê a nova média
+    fflush(stdin);                                          // Limpa o buffer de entrada
+    printf("\nMédia alterada com sucesso!\n");              // Retorna mensagem informando que a alteração ocorreu com sucesso
 }
 
-void alterarFaltas(Descritor* lista, char nome[]) {
-    NoLDEC* aluno = consultar(lista, nome);
-    if (aluno == NULL) {
-        printf("Aluno não encontrado!\n");
-        return;
+void alterarFaltas(Descritor* lista, char nome[]) {     //Procedimento para alterar a quantidade de faltas de um aluno
+    NoLDEC* aluno = consultar(lista, nome);                 // Cria um ponteiro 'aluno' para receber o nó correspondente ao aluno consultado      
+    if (aluno == NULL) {                                    // Se o aluno não for encontrado...
+        printf("Aluno não encontrado!\n");                      // Retorna mensagem informando ao usuário que o aluno não foi encontrado nos registros 
+        return;                                                 // Sai do procedimento
     }
-    int mudanca;
-    printf("Informe a quantidade de faltas a ser acrescida (+) ou retirada (-): ");
-    scanf("%d", &mudanca);
-    fflush(stdin);
-    aluno->info.faltas += mudanca;
-    if (aluno->info.faltas < 0){
-        aluno->info.faltas = 0;
+    int mudanca;                                            // Variável para receber a quantidade de faltas a acrescentar ou remover
+    printf("Informe a quantidade de faltas a ser acrescida(+) ou retirada(-): ");
+    scanf("%d", &mudanca);                                  // Lê quantas faltas deve acrescentar ou remover
+    fflush(stdin);                                          // Limpa o buffer de entrada
+    aluno->info.faltas += mudanca;                          // A nova qtd de faltas será a qtd anterior + a qtd a ser acrescentada ou - a qtd a ser removida
+    if (aluno->info.faltas < 0){                            // Se a quantidade de faltas ficar negativa...
+        aluno->info.faltas = 0;                                 // A qtd de faltas recebe 0
     }
-    printf("Faltas alteradas com sucesso!\n");
+    printf("Faltas alteradas com sucesso!\n");              // Retorna mensagem informando que a alteração ocorreu com sucesso
 }
 
-void exibirAluno(Descritor* lista, char nome[]) {
-    NoLDEC* aluno = consultar(lista, nome);
-    if (aluno == NULL) {
-        printf("Aluno não encontrado!\n");
-        return;
-    }
-    printf("\n--- DADOS DO ALUNO ---\n");
+void exibirAluno(Descritor* lista, char nome[]) {       // Procedimento para exibir todos os alunos cadastrados
+    NoLDEC* aluno = consultar(lista, nome);                 // Cria um ponteiro 'aluno' para receber o nó correspondente ao aluno consultado
+    if (aluno == NULL) {                                    // Se o aluno não for encontrado...
+        printf("Aluno não encontrado!\n");                      // Retorna mensagem informando ao usuário que o aluno não foi encontrado nos registros 
+        return;                                                 // Sai do procedimento
+    }                                                       // Imprimir dados do aluno encontrado 
+    printf("\n--- DADOS DO ALUNO ---\n");                       
     printf("Nome: %s\n", aluno->info.nome);
     printf("Média: %.2f\n", aluno->info.media);
     printf("Faltas: %d\n", aluno->info.faltas);
 }
 
-void remover(Descritor* lista, char nome[]) {
+void remover(Descritor* lista, char nome[]) {           // Procedimento para remover um aluno do cadastro
     NoLDEC* aluno = consultar(lista, nome);
     if (aluno == NULL) {
         printf("Aluno não encontrado!\n");
